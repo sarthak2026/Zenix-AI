@@ -58,25 +58,29 @@ const MainContent = () => {
     }
   }, [typingIndex, currentTextIndex]);
 
+  
   const handleSpeechInput = () => {
     if ("webkitSpeechRecognition" in window) {
       const recognition = new window.webkitSpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = false; 
+      recognition.interimResults = true; 
       recognition.lang = "en-US";
 
       recognition.start();
       setRecognitionActive(true);
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        setRecognitionActive(false);
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setInput(transcript.trim()); 
       };
 
       recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         setRecognitionActive(false);
+        recognition.stop();
       };
 
       recognition.onend = () => {
